@@ -33,9 +33,13 @@ def get_ms_token():
     return None
 
 mcp = FastMCP("Oleg-MCP")
-
 @mcp.tool()
 def search_emails(query: str, count: int = 5):
+    """
+    Searches the user's Office 365 inbox. 
+    The query supports KQL (Keyword Query Language), 
+    e.g., 'from:Microsoft' or 'isread:false'.
+    """
     token = get_ms_token()
     url = f"https://graph.microsoft.com/v1.0/me/messages?$search=\"{query}\"&$top={count}"
     
