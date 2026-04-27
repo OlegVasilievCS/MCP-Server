@@ -4,10 +4,12 @@ import os
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
 
+load_dotenv()
+
 # --- CONFIGURATION ---
 CLIENT_ID = os.getenv("AZURE_CLIENT_ID")
 AUTHORITY = "https://login.microsoftonline.com/common"
-SCOPES = ["Mail.Read"]
+SCOPES = ["Mail.Read", "Mail.Send"]
 
 def get_ms_token():
     base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -26,13 +28,72 @@ def get_ms_token():
     )
 
     accounts = app.get_accounts()
+    result = None
+
     if accounts:
         result = app.acquire_token_silent(SCOPES, account=accounts[0])
-        if result: return result['access_token']
+
+    if not result:
+        print("No valid token found. Opening browser for interactive login...")
+        result = app.acquire_token_interactive(scopes=SCOPES)
+        
+    if result and 'access_token' in result:
+        with open(cache_path, "w") as f:
+            f.write(cache.serialize())
+        return result['access_token']
 
     return None
 
 mcp = FastMCP("Oleg-MCP")
+
+@mcp.tool()
+def send_email(email_subject: str, email_content: str, recipient_email: str):
+    """
+    Sends a plain text email to a specified recipient.
+    :param recipient_email: The email address of the person to receive the mail.
+    :param email_subject: The subject line of the email.
+    :param email_content: The body text of the email.
+    """
+    token = get_ms_token()
+
+    if not token:
+        return "Error: Could not retrieve access token. Try deleting token_cache.bin and restarting."
+
+    url = "https://graph.microsoft.com/v1.0/me/sendMail"
+
+    
+    request_body = {
+        "message": {
+            "subject": email_subject,
+            "body": {
+                "contentType": "Text",
+                "content": email_content
+            },
+            "toRecipients": [ 
+                {
+                    "emailAddress": {
+                        "address": recipient_email
+                    }
+                }
+            ]
+        },
+        "saveToSentItems": "true"
+    }
+
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+
+    response = requests.post(url, headers=headers, json=request_body)
+
+    if response.status_code == 202:
+        return f"Email successfully sent to {recipient_email}!"
+    
+    return f"Error: {response.status_code} - {response.text}"
+
+#TODO: Find the exact endpoint for sending emails
+
 @mcp.tool()
 def search_emails(query: str, count: int = 5):
     """
@@ -53,3 +114,5 @@ def search_emails(query: str, count: int = 5):
 
 if __name__ == "__main__":
     mcp.run()
+    # print("Manual Token Generation...")
+    # print(get_ms_token())
