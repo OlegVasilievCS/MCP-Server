@@ -9,6 +9,7 @@ load_dotenv()
 # --- CONFIGURATION ---
 CLIENT_ID = os.getenv("AZURE_CLIENT_ID")
 AUTHORITY = "https://login.microsoftonline.com/common"
+# SCOPES = ["Mail.Read", "Mail.Send", "Chat.Read"]
 SCOPES = ["Mail.Read", "Mail.Send"]
 
 def get_ms_token():
@@ -35,7 +36,7 @@ def get_ms_token():
 
     if not result:
         print("No valid token found. Opening browser for interactive login...")
-        result = app.acquire_token_interactive(scopes=SCOPES)
+        result = app.acquire_token_interactive(scopes=SCOPES, prompt="consent")
         
     if result and 'access_token' in result:
         with open(cache_path, "w") as f:
@@ -45,6 +46,36 @@ def get_ms_token():
     return None
 
 mcp = FastMCP("Oleg-MCP")
+
+# @mcp.tool()
+# def list_teams_chats(count: int = 10):
+#     """
+#     Lists the user's most recent Microsoft Teams chats.
+#     """
+#     token = get_ms_token()
+#     if not token:
+#         return "Error: Access token missing."
+
+#     headers = {"Authorization": f"Bearer {token}"}
+#     url = f"https://graph.microsoft.com/v1.0/me/chats?$top={count}&$orderby=lastMessagePreview/createdDateTime desc"
+    
+#     response = requests.get(url, headers=headers)
+    
+#     if response.status_code == 200:
+#         chats = response.json().get("value", [])
+#         if not chats:
+#             return "No Teams chats found."
+            
+#         output = []
+#         for c in chats:
+#             name = c.get("topic") or "One-on-One / Group Chat"
+#             chat_id = c.get("id")
+#             output.append(f"Chat Name: {name} | ID: {chat_id}")
+            
+#         return "\n".join(output)
+    
+#     return f"Error: {response.status_code} - {response.text}"
+
 
 @mcp.tool()
 def send_email(email_subject: str, email_content: str, recipient_email: str):
@@ -92,7 +123,6 @@ def send_email(email_subject: str, email_content: str, recipient_email: str):
     
     return f"Error: {response.status_code} - {response.text}"
 
-#TODO: Find the exact endpoint for sending emails
 
 @mcp.tool()
 def search_emails(query: str, count: int = 5):
