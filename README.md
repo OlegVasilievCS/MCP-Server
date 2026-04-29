@@ -19,18 +19,6 @@ APIs: Microsoft Graph API, Jira REST API
 
 Libraries: msal, atlassian-python-api, requests, python-dotenv
 
-Project Structure:
-
-MCP-Server/
-├── main.py             # Entry point: Initializes clients and runs the server
-├── src/
-│   ├── __init__.py     # Package marker
-│   ├── mcp_server.py   # Tool definitions and MCP registration
-│   ├── auth.py         # Microsoft MSAL authentication logic
-│   └── jira_client.py  # Encapsulated Jira API operations
-├── .env                # Environment variables (Azure/Jira credentials)
-└── requirements.txt    # Project dependencies
-
 Setup & Installation
 Clone the Repository:
 
