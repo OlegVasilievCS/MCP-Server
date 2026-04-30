@@ -11,6 +11,7 @@ Secure OAuth Flow: Implements MSAL (Microsoft Authentication Library)
 
 
 **Tech Stack**
+
 Language: Python 3.10+
 
 Framework: FastMCP
@@ -34,10 +35,15 @@ Create a .env file in the root directory and add your credentials:
 
 **Code snippet**
 AZURE_CLIENT_ID=your_azure_id
+
 JIRA_URL=https://your-site.atlassian.net
+
 JIRA_EMAIL=your-email@example.com
+
 JIRA_API_TOKEN=your_atlassian_api_token
+
 Authentication:
+
 Run the application manually once to trigger the interactive Microsoft login and cache your token:
 
 **Bash**
