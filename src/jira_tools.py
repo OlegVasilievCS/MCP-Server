@@ -1,14 +1,29 @@
 from atlassian import Jira
 import os
+import sys
 
 class JiraBridge:
     def __init__(self):
-        self.client = Jira(
-            url=os.getenv("JIRA_URL"),
-            username=os.getenv("JIRA_EMAIL"),
-            password=os.getenv("JIRA_API_TOKEN"),
-            cloud=True
-        )
+        self._client = None
+
+    @property
+    def client(self):
+        if self._client is None:
+            url = os.getenv("JIRA_URL")
+            email = os.getenv("JIRA_EMAIL")
+            token = os.getenv("JIRA_API_TOKEN")
+            
+            # Debug check
+            if not all([url, email, token]):
+                raise ValueError(f"Missing Jira Config: URL={bool(url)}, Email={bool(email)}, Token={bool(token)}")
+                
+            self._client = Jira(
+                url=url,
+                username=email,
+                password=token,
+                cloud=True
+            )
+        return self._client
 
     def create_task(self, summary: str, description: str, project_key="KAN"):
         try:
@@ -17,8 +32,29 @@ class JiraBridge:
                 'summary': summary,
                 'description': description,
                 'issuetype': {'name': 'Task'},
+                'assignee': {'name': os.getenv("JIRA_EMAIL")}
             }
             issue = self.client.create_issue(fields=fields)
-            return f"Ticket created: {issue['key']}"
+            return f"Ticket created and assigned to you: {issue['key']}"
+        except Exception as e:
+            return f"Jira Error: {str(e)}"
+    
+    def list_my_tasks(self):
+        try:
+            email = os.getenv("JIRA_EMAIL")
+            jql = f'assignee = "{email}" AND status != Done'
+            
+            issues = self.client.jql(jql)
+            
+            print(f"JQL Query: {jql}", file=sys.stderr)
+            
+            return [
+                {
+                    "key": i['key'],
+                    "summary": i['fields']['summary'],
+                    "status": i['fields']['status']['name']
+                } 
+                for i in issues.get('issues', [])
+            ]
         except Exception as e:
             return f"Jira Error: {str(e)}"

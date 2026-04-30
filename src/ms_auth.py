@@ -6,7 +6,7 @@ class MicrosoftAuth:
         self.client_id = client_id
         self.authority = "https://login.microsoftonline.com/common"
         self.scopes = ["Mail.Read", "Mail.Send"]
-        # self.scopes == ["Mail.Read", "Mail.Send", "Chat.Read"]
+        # self.scopes = ["Mail.Read", "Mail.Send", "Chat.Read"]
 
         self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.cache_path = os.path.join(self.base_dir, "token_cache.bin")

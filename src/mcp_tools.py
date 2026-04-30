@@ -1,0 +1,58 @@
+# src/ms_tools.py
+import requests
+from mcp.server.fastmcp import FastMCP
+from .ms_auth import MicrosoftAuth
+from .jira_tools import JiraBridge
+import logging
+import sys
+
+logging.basicConfig(level=logging.INFO, 
+                    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", 
+                    stream=sys.stderr)
+
+logger = logging.getLogger("EnterpriseBridge")
+mcp = FastMCP("Enterprise-Bridge")
+
+ms_auth = None 
+jira = JiraBridge()
+
+@mcp.tool()
+def search_emails(query: str, count: int = 5):
+    """Searches Office 365 inbox using KQL."""
+    logger.info(f"Searching emails for: {query}")
+    
+    if ms_auth is None:
+        logger.error("ms_auth is not initialized!")
+        return "Error: Microsoft Auth not initialized."
+
+    token = ms_auth.get_token()
+    if not token:
+        return "Error: Could not get access token. Check console for login prompt."
+
+    url = f"https://graph.microsoft.com/v1.0/me/messages?$search=\"{query}\"&$top={count}"
+    headers = {"Authorization": f"Bearer {token}"}
+    response = requests.get(url, headers=headers)
+    
+    logger.info(f"Graph API Status: {response.status_code}")
+    if response.status_code == 200:
+        emails = response.json().get("value", [])
+        return [{"subject": e["subject"], "sender": e["from"]["emailAddress"]["address"], "snippet": e["bodyPreview"]} for e in emails]
+    return f"Error: {response.status_code}"
+
+@mcp.tool()
+def create_jira_task(summary: str, description: str):
+    """Creates a new Jira task."""
+    logger.info(f"Creating Jira task: {summary}")
+    return jira.create_task(summary, description)
+
+@mcp.tool()
+def get_jira_context():
+    """Returns available Jira projects and keys."""
+    logger.info("Fetching Jira project context")
+    return jira.list_projects()
+
+@mcp.tool()
+def list_jira_tasks():
+    """Lists Jira tasks assigned to the current user that are not yet completed."""
+    logger.info("Fetching assigned Jira tasks...")
+    return jira.list_my_tasks()
