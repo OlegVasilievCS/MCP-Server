@@ -40,6 +40,12 @@ def search_emails(query: str, count: int = 5):
     return f"Error: {response.status_code}"
 
 @mcp.tool()
+def delete_jira_task(summary: str, description: str):
+    """Delete a Jira task based on its' summary, or description"""
+    logger.info(f"Deleting Jira task: {summary}")
+    return jira.delete_task(summary, description)
+
+@mcp.tool()
 def create_jira_task(summary: str, description: str):
     """Creates a new Jira task."""
     logger.info(f"Creating Jira task: {summary}")

@@ -13,7 +13,6 @@ class JiraBridge:
             email = os.getenv("JIRA_EMAIL")
             token = os.getenv("JIRA_API_TOKEN")
             
-            # Debug check
             if not all([url, email, token]):
                 raise ValueError(f"Missing Jira Config: URL={bool(url)}, Email={bool(email)}, Token={bool(token)}")
                 
@@ -24,6 +23,10 @@ class JiraBridge:
                 cloud=True
             )
         return self._client
+    
+    def remove_task(self, issue_key: str):
+        jira.issue_deleted(issue_key)
+
 
     def create_task(self, summary: str, description: str, project_key="KAN"):
         try:
