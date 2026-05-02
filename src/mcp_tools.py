@@ -46,6 +46,12 @@ def delete_jira_task(issue_key: str):
     return jira.delete_task(issue_key)
 
 @mcp.tool()
+def assign_jira_task(issue_key: str, account_id: str):
+    """Assign a Jira issue by its key (e.g., 'KAN-7') and account id."""
+    logger.info(f"Assigning Jira task: {issue_key} with id: {account_id}")
+    return jira.assign_task(issue_key, account_id)
+
+@mcp.tool()
 def create_jira_task(summary: str, description: str):
     """Creates a new Jira task."""
     logger.info(f"Creating Jira task: {summary}")
