@@ -24,8 +24,12 @@ class JiraBridge:
             )
         return self._client
     
-    def remove_task(self, issue_key: str):
-        jira.issue_deleted(issue_key)
+    def delete_task(self, issue_key: str):
+        try:
+            self.client.delete_issue(issue_key)
+            return f"Ticket deleted: {issue_key}"
+        except Exception as e:
+            return f"Jira Error: {str(e)}"
 
 
     def create_task(self, summary: str, description: str, project_key="KAN"):
