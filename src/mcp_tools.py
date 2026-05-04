@@ -40,6 +40,12 @@ def search_emails(query: str, count: int = 5):
     return f"Error: {response.status_code}"
 
 @mcp.tool()
+def get_all_jira_issues(project: str):
+    """Returns a list of all issues for a given project key (e.g., 'KAN')."""
+    logger.info(f"Returning all issues for project: {project}")
+    return jira.get_all_issues(project)
+
+@mcp.tool()
 def delete_jira_task(issue_key: str):
     """Deletes a Jira issue by its key (e.g., 'KAN-7')."""
     logger.info(f"Deleting Jira task: {issue_key}")

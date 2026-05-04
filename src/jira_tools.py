@@ -24,6 +24,28 @@ class JiraBridge:
             )
         return self._client
     
+    def get_all_issues(self, project):
+        try:
+            issues = self.client.get_all_project_issues(project, fields='*all', start=0, limit=50)
+            return [
+                {
+                "key": i['key'],
+                "summary": i['fields']['summary'],
+                "status": i['fields']['status']['name']
+                } 
+                for i in issues
+            ]
+        except Exception as e:
+            return f"Jira Error: {str(e)}"
+
+    
+    def assign_task(self, issue_key: str, account_id: str):
+        try:
+            self.client.assign_issue(issue_key, account_id)
+            return f"Ticket assigned: {issue_key}"
+        except Exception as e:
+            return f"Jira Error: {str(e)}"
+    
     def delete_task(self, issue_key: str):
         try:
             self.client.delete_issue(issue_key)
