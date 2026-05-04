@@ -46,22 +46,22 @@ def get_all_jira_issues(project: str):
     return jira.get_all_issues(project)
 
 @mcp.tool()
-def delete_jira_task(issue_key: str):
+def delete_jira_issue(issue_key: str):
     """Deletes a Jira issue by its key (e.g., 'KAN-7')."""
     logger.info(f"Deleting Jira task: {issue_key}")
-    return jira.delete_task(issue_key)
+    return jira.delete_issue(issue_key)
 
 @mcp.tool()
-def assign_jira_task(issue_key: str, account_id: str):
+def assign_jira_issue(issue_key: str, account_id: str):
     """Assign a Jira issue by its key (e.g., 'KAN-7') and account id."""
     logger.info(f"Assigning Jira task: {issue_key} with id: {account_id}")
-    return jira.assign_task(issue_key, account_id)
+    return jira.assign_issue(issue_key, account_id)
 
 @mcp.tool()
-def create_jira_task(summary: str, description: str):
+def create_jira_issue(summary: str, description: str):
     """Creates a new Jira task."""
     logger.info(f"Creating Jira task: {summary}")
-    return jira.create_task(summary, description)
+    return jira.create_issue(summary, description)
 
 @mcp.tool()
 def get_jira_context():
@@ -70,7 +70,7 @@ def get_jira_context():
     return jira.list_projects()
 
 @mcp.tool()
-def list_jira_tasks():
+def list_jira_issues():
     """Lists Jira tasks assigned to the current user that are not yet completed."""
     logger.info("Fetching assigned Jira tasks...")
-    return jira.list_my_tasks()
+    return jira.list_my_issues()

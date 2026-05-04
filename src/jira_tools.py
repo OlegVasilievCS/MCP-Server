@@ -39,14 +39,14 @@ class JiraBridge:
             return f"Jira Error: {str(e)}"
 
     
-    def assign_task(self, issue_key: str, account_id: str):
+    def assign_issue(self, issue_key: str, account_id: str):
         try:
             self.client.assign_issue(issue_key, account_id)
             return f"Ticket assigned: {issue_key}"
         except Exception as e:
             return f"Jira Error: {str(e)}"
     
-    def delete_task(self, issue_key: str):
+    def delete_issue(self, issue_key: str):
         try:
             self.client.delete_issue(issue_key)
             return f"Ticket deleted: {issue_key}"
@@ -54,7 +54,7 @@ class JiraBridge:
             return f"Jira Error: {str(e)}"
 
 
-    def create_task(self, summary: str, description: str, project_key="KAN"):
+    def create_issue(self, summary: str, description: str, project_key="KAN"):
         try:
             fields = {
                 'project': {'key': project_key},
@@ -68,7 +68,7 @@ class JiraBridge:
         except Exception as e:
             return f"Jira Error: {str(e)}"
     
-    def list_my_tasks(self):
+    def list_my_issues(self):
         try:
             email = os.getenv("JIRA_EMAIL")
             jql = f'assignee = "{email}" AND status != Done'
