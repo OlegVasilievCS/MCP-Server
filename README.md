@@ -62,7 +62,10 @@ Bash
     Run the application manually once to trigger the interactive Microsoft login:
     ```bash
     python main.py
+    
     ```
+```
+
 
 **Usage Examples**
 
