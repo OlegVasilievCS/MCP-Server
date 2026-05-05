@@ -25,10 +25,13 @@ class JiraBridge:
         return self._client
     
     def add_research_comment(self, issue_key: str, research_data: str):
-        """Add a technical research summary as a comment to a Jira issue"""
+        """Add a technical research summary as a comment to a Jira issue
+        
+        """
         try:    
             comment_body = f"AI Research Assistant Findings:\n\n{research_data}"
             self.client.issue_add_comment(issue_key, comment_body)
+            return f"Research comment: {research_data} was added to: {issue_key}"
         except Exception as e:
             return f"Jira Error: {str(e)}"
     
