@@ -24,9 +24,17 @@ class JiraBridge:
             )
         return self._client
     
+    def add_research_comment(self, issue_key: str, research_data: str):
+        """Add a technical research summary as a comment to a Jira issue"""
+        try:    
+            comment_body = f"AI Research Assistant Findings:\n\n{research_data}"
+            self.client.issue_add_comment(issue_key, comment_body)
+        except Exception as e:
+            return f"Jira Error: {str(e)}"
+    
     def get_all_issues(self, project):
         try:
-            issues = self.client.get_all_project_issues(project, fields='*all', start=0, limit=50)
+            issues = self.client.get_all_project_issues(project, fields='summary,status', start=0, limit=50)
             return [
                 {
                 "key": i['key'],
