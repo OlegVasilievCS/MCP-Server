@@ -2,7 +2,7 @@ from typing import TypedDict, List
 from langgraph.graph import StateGraph
 import os
 from dotenv import load_dotenv
-from src.mcp_tools import mcp, search_emails
+from src.mcp_tools import mcp, search_emails, create_jira_issue
 from src.ms_auth import MicrosoftAuth
 import src.mcp_tools as mcp_module
 
@@ -29,17 +29,28 @@ def agent_response_node(state: ChatState) -> ChatState:
     return state
 
 def email_fetching_node(state: ChatState) -> ChatState:
-    results = search_emails(query="Allez Up", count=3)
+    results = search_emails(query="Econo", count=1)
     state["emails"] = results
     state["messages"].append(f"System: Fetched {len(results)} emails")
     return state
 
+def ai_create_jira_issue(state: ChatState) -> ChatState:
+    jira_issue = create_jira_issue(state["emails"][0]["subject"], state["emails"][0]["snippet"])
+    return state
+
+
+#     @mcp.tool()
+# def create_jira_issue(summary: str, description: str):
+#     """Creates a new Jira task."""
+#     logger.info(f"Creating Jira task: {summary}")
+#     return jira.create_issue(summary, description)
+
 
 graph = StateGraph(ChatState)
 graph.add_node("fetch_emails", email_fetching_node)
-# graph.add_node("respond", agent_response_node)
+graph.add_node("create_issue", ai_create_jira_issue)
 
-# graph.add_edge("fetch_emails", "respond")
+graph.add_edge("fetch_emails", "create_issue")
 graph.set_entry_point("fetch_emails")
 
 app = graph.compile()
