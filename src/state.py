@@ -17,7 +17,7 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_PROJECT"] = "MCP-Server-Email-Reader"
 
 
-class State(TypedDict):
+class AgentState(TypedDict):
     # Messages of are of type 'list'. The add_messages appends each message to
     #  the list, instead of overwritng. 
     messages: Annotated[list, add_messages]   

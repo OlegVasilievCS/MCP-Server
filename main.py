@@ -10,6 +10,7 @@ def main():
     client_id = os.getenv("AZURE_CLIENT_ID")
     mcp_module.ms_auth = MicrosoftAuth(client_id)
     
+    
     mcp_module.logger.info("Server is initialized and listening...")
     
     mcp.run()

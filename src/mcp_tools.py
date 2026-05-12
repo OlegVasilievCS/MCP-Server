@@ -1,8 +1,8 @@
 # src/ms_tools.py
 import requests
 from mcp.server.fastmcp import FastMCP
-from .ms_auth import MicrosoftAuth
-from .jira_tools import JiraBridge
+from src.ms_auth import MicrosoftAuth
+from src.jira_tools import JiraBridge
 import logging
 import sys
 from tavily import TavilyClient
