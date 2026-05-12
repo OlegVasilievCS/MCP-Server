@@ -36,8 +36,10 @@ def email_fetching_node(state: ChatState) -> ChatState:
 
 def ai_create_jira_issue(state: ChatState) -> ChatState:
     jira_issue = create_jira_issue(state["emails"][0]["subject"], state["emails"][0]["snippet"])
+    state["messages"].append(f"Jira issue added: {jira_issue}")
     return state
 
+# TO DO: Make replace the '(query="Econo", count=1)' with AI generative 
 
 #     @mcp.tool()
 # def create_jira_issue(summary: str, description: str):
