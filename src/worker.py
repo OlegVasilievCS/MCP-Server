@@ -5,8 +5,27 @@ from dotenv import load_dotenv
 from src.mcp_tools import mcp, search_emails, create_jira_issue
 from src.ms_auth import MicrosoftAuth
 import src.mcp_tools as mcp_module
+from groq import Groq
 
 load_dotenv()
+
+
+client = Groq(
+    api_key=os.environ.get("GROQ_API_KEY"),
+)
+
+chat_completion = client.chat.completions.create(
+    messages=[
+        {
+            "role": "user",
+            "content": "Explain the importance of fast language models",
+        }
+    ],
+    model="llama-3.3-70b-versatile",
+)
+print(chat_completion.choices[0].message.content)
+
+
 
 client_id = os.getenv("AZURE_CLIENT_ID")
 mcp_module.ms_auth = MicrosoftAuth(client_id)

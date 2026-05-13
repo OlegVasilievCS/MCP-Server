@@ -2,6 +2,8 @@ from atlassian import Jira
 import os
 import sys
 
+
+
 class JiraBridge:
     def __init__(self):
         self._client = None
