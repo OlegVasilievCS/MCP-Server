@@ -6,24 +6,26 @@ from src.mcp_tools import mcp, search_emails, create_jira_issue
 from src.ms_auth import MicrosoftAuth
 import src.mcp_tools as mcp_module
 from groq import Groq
-
+from datetime import date
 load_dotenv()
 
 
-client = Groq(
-    api_key=os.environ.get("GROQ_API_KEY"),
-)
 
-chat_completion = client.chat.completions.create(
+
+def is_email_a_task(emails):
+    client = Groq(api_key=os.environ.get("GROQ_API_KEY"),)
+
+
+    chat_completion = client.chat.completions.create(
     messages=[
-        {
+            {
             "role": "user",
-            "content": "Explain the importance of fast language models",
-        }
-    ],
-    model="llama-3.3-70b-versatile",
-)
-print(chat_completion.choices[0].message.content)
+            "content": f"Bases on these {emails} tell me shotly if the are a task for me to complete",
+            }
+        ],
+        model="llama-3.3-70b-versatile",
+    )
+    print(f"is_email_a_task: ", chat_completion.choices[0].message.content)
 
 
 
@@ -48,7 +50,11 @@ def agent_response_node(state: ChatState) -> ChatState:
     return state
 
 def email_fetching_node(state: ChatState) -> ChatState:
-    results = search_emails(query="Econo", count=1)
+    today = date.today().strftime('%Y-%m-%d')
+    query_string = f"isread:false received:{today}"
+
+    results = search_emails(query=query_string, count=3)
+    is_email_a_task(results)
     state["emails"] = results
     state["messages"].append(f"System: Fetched {len(results)} emails")
     return state
@@ -58,7 +64,6 @@ def ai_create_jira_issue(state: ChatState) -> ChatState:
     state["messages"].append(f"Jira issue added: {jira_issue}")
     return state
 
-# TO DO: Make replace the '(query="Econo", count=1)' with AI generative 
 
 #     @mcp.tool()
 # def create_jira_issue(summary: str, description: str):
