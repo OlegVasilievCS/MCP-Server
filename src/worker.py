@@ -4,12 +4,13 @@ import os
 from dotenv import load_dotenv
 from src.mcp_tools import mcp, search_emails, create_jira_issue
 from src.ms_auth import MicrosoftAuth
+from src.jira_tools import JiraBridge
 import src.mcp_tools as mcp_module
 from groq import Groq
 from datetime import date
 load_dotenv()
 
-
+jira_bridge = JiraBridge()
 
 
 def is_email_a_task(emails):
@@ -54,14 +55,25 @@ def email_fetching_node(state: ChatState) -> ChatState:
     query_string = f"isread:false received:{today}"
 
     results = search_emails(query=query_string, count=3)
-    is_email_a_task(results)
     state["emails"] = results
     state["messages"].append(f"System: Fetched {len(results)} emails")
     return state
 
 def ai_create_jira_issue(state: ChatState) -> ChatState:
-    jira_issue = create_jira_issue(state["emails"][0]["subject"], state["emails"][0]["snippet"])
-    state["messages"].append(f"Jira issue added: {jira_issue}")
+    exiting_jira_issues = jira_bridge.get_all_issues("KAN")
+    print("Existing Jira IsS:", exiting_jira_issues)
+    print("Existing Emails IsS:", state["emails"][0]["subject"])
+    for i in state["emails"][0]["subject"] :
+        for j in exiting_jira_issues:
+            if i not in j or j is None:
+                print("Inside the Loop")
+                jira_issue = create_jira_issue(state["emails"][0]["subject"], state["emails"][0]["snippet"])
+                state["messages"].append(f"Jira issue added: {jira_issue}")
+
+
+    
+    # jira_issue = create_jira_issue(state["emails"][0]["subject"], state["emails"][0]["snippet"])
+    # state["messages"].append(f"Jira issue added: {jira_issue}")
     return state
 
 
@@ -89,4 +101,4 @@ state = {
 
 for _ in range(1):
     state = app.invoke(state)
-    print(state)
+    # print(state)
